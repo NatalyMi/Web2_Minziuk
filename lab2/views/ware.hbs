@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+</head>
+<body>
+   
+    {{> menu}}
+        <div class="m-5">
+            <h1>List Ware</h1>
+            <form name="shopForm">
+                
+                 <input type="hidden" class="form-control"  name="id" value="-1">
+             
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Name</label>
+                  <input type="text" class="form-control" id="name" name="name">
+                 </div>
+                 <div class="form-group">
+                    <label for="exampleInputEmail1">Country</label>
+                    <input type="text" class="form-control" id="address" name="address">
+                   </div>
+                   
+                <button type="submit" class="btn btn-primary m-1">Submit</button>
+              </form>
+              <form name="searchForm">
+                <div class="form-group">
+                  <label for="search">Search</label>
+                  <input type="text" class="form-control" placeholder="Name" id="name" name="name">
+                 </div>
+                
+                <button type="submit" class="btn btn-primary m-1">Submit</button>
+              </form>
+               <form name="storageForm">
+                <div class="form-group">
+                  <label for="search">In Storage</label>
+                  <input type="text" class="form-control" placeholder="storage id" id="storageId" name="storageId">
+                 </div>
+                
+                <button type="submit" class="btn btn-primary m-1">Submit</button>
+              </form>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">address</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Shop</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                </tbody>
+              </table>  
+        </div>
+        <script>
+            function GetUsers() {
+                $.ajax({
+                    url: "/api/wares",
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function(users) {
+                        var row_table = '';
+                       $.each(JSON.parse(users), function(index, user){
+                        row_table += row(user);
+                        });
+                        $('table tbody').append(row_table);
+                    }
+                })
+            }
+             $("[name='searchForm']").submit(function(event){
+                event.preventDefault();
+
+                var name = this.elements["name"].value;
+                
+                    $.ajax({
+                        url: "/api/search",
+                        contentType: "application/json",
+                        method: "POST",
+                        data: JSON.stringify({
+                            name:name,
+                            type:"Wares"
+                        }),
+                         success: function(shop) {
+                        console.log(shop)
+                        $('table tbody').replaceWith(row(shop));
+                    }
+                    })
+                
+            });
+             $("[name='storageForm']").submit(function(event){
+                event.preventDefault();
+
+                var storageId = this.elements["storageId"].value;
+                
+                    $.ajax({
+                        url: "/api/onStorage",
+                        contentType: "application/json",
+                        method: "POST",
+                        data: JSON.stringify({
+                            storageId:storageId,
+                        }),
+                         success: function(items) {
+                        var row_table = '';
+                       $.each(JSON.parse(items), function(index, item){
+                        row_table += row(item);
+                        });
+                        $('table tbody').replaceWith(row_table);
+                    }
+                    })
+                
+            });
+
+            $("[name='shopForm']").submit(function(event){
+                event.preventDefault();
+               
+                var id = this.elements["id"].value;
+                var name = this.elements["name"].value;
+                var address = this.elements["address"].value;
+                if(id == -1) {
+                    $.ajax({
+                        url: "api/users",
+                        contentType: "application/json",
+                        method: "POST",
+                        data: JSON.stringify({
+                            name:name,
+                            address:address,
+                            type:"ware"
+                        }),
+                        success: function(item) {
+                            var row_table = row(item);
+                            $('table tbody').append(row_table);
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        url: "api/wares",
+                        contentType: "application/json",
+                        method: "PUT",
+                        data: JSON.stringify({
+                            id: id,
+                            name:name,
+                            address:address
+                        }),
+                        success: function(item) {
+                            item = JSON.parse(item);
+                            
+                            $(`#name${item.id}`).text(item.name);
+                            $(`#address${item.id}`).text(item.country);
+                            $(`#shop${item.id}`).text(item.shop);
+                        }
+                    })
+                    this.elements["id"].value = -1;
+                }
+            });
+            $('body').on("click",'.edit', function(){
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "api/wares/" + id,
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function(item) {
+                        item = JSON.parse(item);
+                        var form = document.forms['shopForm'];
+                        form.elements['id'].value = item.id;
+                        form.elements['address'].value = item.country;
+                        form.elements['name'].value = item.name;
+                    }
+                })
+            })
+            $('body').on("click",'.delete', function(){
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "api/wares/" + id,
+                    method: "delete",
+                    contentType: "application/json",
+                    success: function(item_id) {
+                        $(`#td${id}`).remove();
+                    }
+                })
+            })
+            function row(item){
+                return  `<tr id="td${item.id}">
+                                        <td>${item.id}</td>
+                                        <td id="address${item.id}">${item.country}</td>
+                                        <td id="name${item.id}">${item.name}</td>
+                                         <td id="shop${item.id}">${item.shop}</td>
+                                        <td>
+                                            <a data-id="${item.id}" class="edit" > Edit </a>
+                                        </td>
+                                        <td>
+                                            <a data-id="${item.id}" class="delete" > Delete </a>
+                                        </td>
+                                    </tr>`;
+            }
+            GetUsers();
+        </script>
+     
+    
+</body>
+</html>

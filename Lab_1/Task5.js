@@ -1,0 +1,10 @@
+var date1 = new Date('02-10-2021')
+var date2 = new Date('01-10-2021')
+var diff = Math.abs(date1.getTime() - date2.getTime())
+var day = 1000 * 3600 * 24
+var days = Math.floor(diff / day)
+console.log(days)
+var weeks = Math.floor(diff / day / 7)
+console.log(weeks)
+var months = Math.floor(diff / day / 30)
+console.log(months)

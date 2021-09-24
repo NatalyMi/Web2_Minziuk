@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta http-equiv="X-UA-Compatible" content="ie=edge">
+ <script src="node_modules/socket.io/client-dist/socket.io.js"></script>
+ <script
+ src="https://code.jquery.com/jquery-3.3.1.min.js"
+ integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+ crossorigin="anonymous">
+ </script>
+
+ <script src="/chat.js"></script>
+ 
+ <title>MyChat</title>
+</head>
+<body>
+ <div>Chat</div>
+ <form class="message_form">
+    <input type="text" class="message_form__input" placeholder="Type a message" />
+    <button class="message_form__button" type="submit">
+      Enter
+    </button>
+  </form>
+    <div class="inbox">
+      <div class="inbox__messages">
+        <div class="messages__history"></div>
+        <div class="fallback"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
